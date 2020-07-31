@@ -466,6 +466,8 @@ func vipsSave(image *C.VipsImage, o vipsSaveOptions) ([]byte, error) {
 	palette := C.int(boolToInt(o.Palette))
 
 	log.Println("before IsTypeSupportedSave")
+	log.Printf("save length %v\n", length)
+	log.Printf("save interlace %v\n", interlace)
 	if o.Type != 0 && !IsTypeSupportedSave(o.Type) {
 		return nil, fmt.Errorf("VIPS cannot save to %#v", ImageTypes[o.Type])
 	}
@@ -480,14 +482,17 @@ func vipsSave(image *C.VipsImage, o vipsSaveOptions) ([]byte, error) {
 	case HEIF:
 		saveErr = C.vips_heifsave_bridge(tmpImage, &ptr, &length, strip, quality, lossless)
 	default:
+		log.Println("before vips_jpegsave_bridge")
 		saveErr = C.vips_jpegsave_bridge(tmpImage, &ptr, &length, strip, quality, interlace)
+		log.Printf("after vips_jpegsave_bridge saveErr:%v", saveErr)
 	}
 
 	if int(saveErr) != 0 {
+		log.Println("got error")
 		return nil, catchVipsError()
 	}
 
-	log.Printf("save length %v\n", length)
+	log.Printf("before Go Bytes %v\n", length)
 	buf := C.GoBytes(ptr, C.int(length))
 
 	// Clean up
