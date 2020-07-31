@@ -398,6 +398,7 @@ func vipsPreSave(image *C.VipsImage, o *vipsSaveOptions) (*C.VipsImage, error) {
 	}
 	interpretation := C.VipsInterpretation(o.Interpretation)
 
+	log.Println("before vipsColourspaceIsSupported")
 	// Apply the proper colour space
 	if vipsColourspaceIsSupported(image) {
 		err := C.vips_colourspace_bridge(image, &outImage, interpretation)
@@ -406,6 +407,7 @@ func vipsPreSave(image *C.VipsImage, o *vipsSaveOptions) (*C.VipsImage, error) {
 		}
 		image = outImage
 	}
+	log.Println("after vipsColourspaceIsSupported")
 
 	if o.OutputICC != "" && o.InputICC != "" {
 		outputIccPath := C.CString(o.OutputICC)
@@ -440,6 +442,7 @@ func vipsPreSave(image *C.VipsImage, o *vipsSaveOptions) (*C.VipsImage, error) {
 func vipsSave(image *C.VipsImage, o vipsSaveOptions) ([]byte, error) {
 	defer C.g_object_unref(C.gpointer(image))
 
+	log.Println("vips pre save")
 	tmpImage, err := vipsPreSave(image, &o)
 	if err != nil {
 		return nil, err
@@ -462,6 +465,7 @@ func vipsSave(image *C.VipsImage, o vipsSaveOptions) ([]byte, error) {
 	lossless := C.int(boolToInt(o.Lossless))
 	palette := C.int(boolToInt(o.Palette))
 
+	log.Println("before IsTypeSupportedSave")
 	if o.Type != 0 && !IsTypeSupportedSave(o.Type) {
 		return nil, fmt.Errorf("VIPS cannot save to %#v", ImageTypes[o.Type])
 	}
