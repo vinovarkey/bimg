@@ -9,6 +9,7 @@ import "C"
 import (
 	"errors"
 	"fmt"
+	"log"
 	"math"
 	"os"
 	"runtime"
@@ -482,6 +483,7 @@ func vipsSave(image *C.VipsImage, o vipsSaveOptions) ([]byte, error) {
 		return nil, catchVipsError()
 	}
 
+	log.Printf("save length %v\n", length)
 	buf := C.GoBytes(ptr, C.int(length))
 
 	// Clean up

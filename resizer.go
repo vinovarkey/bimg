@@ -9,6 +9,7 @@ import "C"
 import (
 	"errors"
 	"fmt"
+	"log"
 	"math"
 )
 
@@ -22,10 +23,12 @@ var (
 func resizer(buf []byte, o Options) ([]byte, error) {
 	defer C.vips_thread_shutdown()
 
+	log.Println("going to load image")
 	image, imageType, err := loadImage(buf)
 	if err != nil {
 		return nil, err
 	}
+	log.Println("after load image")
 
 	// Clone and define default options
 	o = applyDefaults(o, imageType)
@@ -132,6 +135,7 @@ func resizer(buf []byte, o Options) ([]byte, error) {
 		return nil, err
 	}
 
+	log.Println("going to save image")
 	return saveImage(image, o)
 }
 
@@ -140,10 +144,12 @@ func loadImage(buf []byte) (*C.VipsImage, ImageType, error) {
 		return nil, JPEG, errors.New("Image buffer is empty")
 	}
 
+	log.Println("going to vips read")
 	image, imageType, err := vipsRead(buf)
 	if err != nil {
 		return nil, JPEG, err
 	}
+	log.Println("after vips read")
 
 	return image, imageType, nil
 }

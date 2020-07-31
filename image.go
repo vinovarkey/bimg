@@ -1,5 +1,7 @@
 package bimg
 
+import "log"
+
 // Image provides a simple method DSL to transform a given image as byte buffer.
 type Image struct {
 	buffer []byte
@@ -195,7 +197,9 @@ func (i *Image) Gamma(exponent float64) ([]byte, error) {
 // talking with libvips bindings accordingly and returning the resultant
 // image buffer.
 func (i *Image) Process(o Options) ([]byte, error) {
+	log.Println("Process")
 	image, err := Resize(i.buffer, o)
+	log.Println("After Process")
 	if err != nil {
 		return nil, err
 	}
